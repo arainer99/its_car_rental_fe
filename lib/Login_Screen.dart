@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
+import 'package:http/http.dart' as http;
+import 'httpService.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,13 +17,19 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  _login() {
+  _login() async {
     if (nameController.text.isEmpty || passwordController.text.isEmpty) {
       print('Insert values');
       return;
     }
-    print(nameController.text);
-    print(passwordController.text);
+
+    final String body = jsonEncode(<String, String>{
+      'username': nameController.text,
+      'password': passwordController.text
+    });
+    final http.Response response = await HttpService.postRequest('auth/login', body);
+
+    print(response.body);
   }
 
   _showRegisterScreen() {
@@ -99,8 +109,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       FlatButton(
-                        textColor: Theme.of(context).primaryColor,
-                        child: FlatButton(
+                        // textColor: Theme.of(context).primaryColor,
+                        // child: FlatButton(
                           child: RaisedButton(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -110,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: Text('Registrieren'),
                             onPressed: _showRegisterScreen,
                           ),
-                        ),
+                        // ),
                       )
                     ],
                     mainAxisAlignment: MainAxisAlignment.center,
