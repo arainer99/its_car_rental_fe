@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:its_car_rental/Services/SecureStorageService.dart';
 import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
 import 'package:http/http.dart' as http;
-import 'httpService.dart';
+import 'Services/httpService.dart';
 
 class LoginPage extends StatefulWidget {
   @override
   State createState() {
+
     return new _LoginPageState();
   }
 }
@@ -16,6 +18,19 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfAlreadyLoggedIn();
+  }
+
+  void _checkIfAlreadyLoggedIn() {
+    if(SecureStorageService().getItem('jwt').toString().isNotEmpty) {
+      Navigator.pushNamed(context, '/home');
+    }
+  }
 
   _login() async {
     if (nameController.text.isEmpty || passwordController.text.isEmpty) {
@@ -27,9 +42,13 @@ class _LoginPageState extends State<LoginPage> {
       'username': nameController.text,
       'password': passwordController.text
     });
-    final http.Response response = await HttpService.postRequest('auth/login', body);
-
-    print(response.body);
+    try {
+      final http.Response response = await HttpService.postRequest('auth/login', body);
+      SecureStorageService().addItem('jwt', jsonDecode(response.body)['accessToken']);
+      Navigator.pushNamed(context, '/home');
+    } catch (Exception) {
+      print('LOGIN FAILED');
+    }
   }
 
   _showRegisterScreen() {

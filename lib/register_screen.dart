@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
 import 'package:http/http.dart' as http;
 import 'package:its_car_rental/userDTO.dart';
-import 'httpService.dart';
+import 'Services/httpService.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:its_car_rental/Login_Screen.dart';
+import 'package:its_car_rental/MainScreen.dart';
 import 'package:its_car_rental/register_screen.dart';
 
 void main() {
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         // '/': (context) => LoginPage(),
-        '/register': (context) => RegisterScreen()
+        '/register': (context) => RegisterScreen(),
+        '/home': (context) => MainScreen(),
       },
       home: LoginPage()
     );
