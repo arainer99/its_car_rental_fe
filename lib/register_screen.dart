@@ -1,10 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:its_car_rental/Services/UserService.dart';
 import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
-import 'package:http/http.dart' as http;
-import 'package:its_car_rental/userDTO.dart';
-import 'Services/httpService.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -19,15 +16,24 @@ class _RegisterScreenState extends State<StatefulWidget> {
   TextEditingController nameController = new TextEditingController();
   TextEditingController surNameController = new TextEditingController();
 
+  final globalKey = GlobalKey<ScaffoldState>();
+
   void _register() async {
-    final String body = jsonEncode(<String, String>{
-      'username': mailController.text,
-      'password': passwordController.text
-    });
-    final http.Response response = await HttpService.postRequest('auth/register', body);
-    final userDto user = userDto.fromJson(jsonDecode(response.body));
-    print(user.username);
-    print(user.role);
+    final UserService userService = new UserService();
+    if (userService.register(nameController.text, surNameController.text,
+            mailController.text, passwordController.text) !=
+        null) {
+      Navigator.pushNamed(context, '/home');
+      return;
+    }
+    globalKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(
+          'Register failed!',
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   void test() {
@@ -37,6 +43,7 @@ class _RegisterScreenState extends State<StatefulWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: globalKey,
       body: Padding(
         padding: EdgeInsets.all(10),
         child: ListView(

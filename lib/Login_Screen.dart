@@ -1,16 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:its_car_rental/Services/SecureStorageService.dart';
+import 'package:its_car_rental/Services/UserService.dart';
 import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
-import 'package:http/http.dart' as http;
-import 'Services/httpService.dart';
+
+import 'DTOs/userDTO.dart';
 
 class LoginPage extends StatefulWidget {
   @override
   State createState() {
-
     return new _LoginPageState();
   }
 }
@@ -19,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  final globalKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -26,37 +25,44 @@ class _LoginPageState extends State<LoginPage> {
     _checkIfAlreadyLoggedIn();
   }
 
-  void _checkIfAlreadyLoggedIn() {
-    if(SecureStorageService().getItem('jwt').toString().isNotEmpty) {
+  void _checkIfAlreadyLoggedIn() async {
+    final String jwtToken = await SecureStorageService().getItem('jwt');
+    if (jwtToken != null && jwtToken.isNotEmpty) {
       Navigator.pushNamed(context, '/home');
+      return;
     }
   }
 
-  _login() async {
+  Future<void> _login() async {
     if (nameController.text.isEmpty || passwordController.text.isEmpty) {
-      print('Insert values');
+      globalKey.currentState.showSnackBar(SnackBar(
+        content: Text(
+          'Please provide E-Mail and Password',
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Theme.of(context).errorColor,
+      ));
       return;
     }
 
-    final String body = jsonEncode(<String, String>{
-      'username': nameController.text,
-      'password': passwordController.text
-    });
-    try {
-      final http.Response response = await HttpService.postRequest('auth/login', body);
-      SecureStorageService().addItem('jwt', jsonDecode(response.body)['accessToken']);
+    UserService userService = new UserService();
+    final UserDTO user =
+        await userService.login(nameController.text, passwordController.text);
+    if (user != null) {
       Navigator.pushNamed(context, '/home');
-    } catch (Exception) {
-      print('LOGIN FAILED');
+      return;
     }
+    globalKey.currentState.showSnackBar(SnackBar(
+      content: Text(
+        'Password or E-Mail is wrong!',
+        textAlign: TextAlign.center,
+      ),
+      backgroundColor: Theme.of(context).errorColor,
+    ));
   }
 
   _showRegisterScreen() {
     Navigator.pushNamed(context, '/register');
-  }
-
-  _returnPreviousScreen() {
-    Navigator.pop(context);
   }
 
   @override
@@ -69,6 +75,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       child: Scaffold(
+        key: globalKey,
         backgroundColor: Colors.transparent,
         body: Padding(
           padding: EdgeInsets.all(10),
@@ -130,15 +137,15 @@ class _LoginPageState extends State<LoginPage> {
                       FlatButton(
                         // textColor: Theme.of(context).primaryColor,
                         // child: FlatButton(
-                          child: RaisedButton(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            textColor: Colors.white,
-                            color: Theme.of(context).primaryColor,
-                            child: Text('Registrieren'),
-                            onPressed: _showRegisterScreen,
+                        child: RaisedButton(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
+                          textColor: Colors.white,
+                          color: Theme.of(context).primaryColor,
+                          child: Text('Registrieren'),
+                          onPressed: _showRegisterScreen,
+                        ),
                         // ),
                       )
                     ],

@@ -23,20 +23,29 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Categories'),
+        actions: [
+          PopupMenuButton(
+              itemBuilder: (BuildContext context) {
+                List<PopupMenuItem> items = new List();
+                items.add(new PopupMenuItem(child: Text('Item 1')));
+                items.add(new PopupMenuItem(child: Text('Item 2')));
+                return items;
+              },
+              child: CircleAvatar(
+                child: Icon(Icons.person),
+              ),
+          )
+        ],
+        toolbarHeight: 40.0,
+      ),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: ListView(
           children: <Widget>[
             Text('Logged in with jwt-key: '),
             Text(_getJwt()),
-            FlatButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: RaisedButton(
-                child: Text('Go Back'),
-              ),
-            )
           ],
         ),
       ),
