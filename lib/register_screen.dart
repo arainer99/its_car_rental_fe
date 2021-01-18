@@ -28,16 +28,9 @@ class _RegisterScreenState extends State<StatefulWidget> {
     }
     globalKey.currentState.showSnackBar(
       SnackBar(
-        content: Text(
-          'Register failed!',
-          textAlign: TextAlign.center,
-        ),
+        content: CenteredText('Register failed!'),
       ),
     );
-  }
-
-  void test() {
-    print('HI');
   }
 
   @override
@@ -54,46 +47,22 @@ class _RegisterScreenState extends State<StatefulWidget> {
               child: BackButton(),
             ),
             Header('Neuen Account erstellen', color: Colors.blue),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: surNameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Vorname',
-                ),
-              ),
+            ItsOutlinedInputField(
+              controller: surNameController,
+              labelText: 'Vorname',
             ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Nachname',
-                ),
-              ),
+            ItsOutlinedInputField(
+              controller: nameController,
+              labelText: 'Nachname',
             ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: mailController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'E-Mail',
-                ),
-              ),
+            ItsOutlinedInputField(
+              controller: mailController,
+              labelText: 'E-Mail',
             ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                obscureText: true,
-                controller: passwordController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Passwort',
-                ),
-              ),
+            ItsOutlinedInputField(
+              controller: passwordController,
+              obscureText: true,
+              labelText: 'Password',
             ),
             FlatButton(
               height: 40,

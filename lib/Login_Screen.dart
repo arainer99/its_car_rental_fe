@@ -53,10 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     globalKey.currentState.showSnackBar(SnackBar(
-      content: Text(
-        'Password or E-Mail is wrong!',
-        textAlign: TextAlign.center,
-      ),
+      content: CenteredText('Login Failed'),
       backgroundColor: Theme.of(context).errorColor,
     ));
   }
@@ -89,26 +86,14 @@ class _LoginPageState extends State<LoginPage> {
                   color: Theme.of(context).primaryColor,
                   padding: EdgeInsets.all(10),
                 ),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'User Name',
-                    ),
-                  ),
+                ItsOutlinedInputField(
+                  controller: nameController,
+                  labelText: 'E-Mail',
                 ),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: TextField(
-                    obscureText: true,
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password',
-                    ),
-                  ),
+                ItsOutlinedInputField(
+                  controller: passwordController,
+                  labelText: 'Password',
+                  obscureText: true,
                 ),
                 FlatButton(
                   height: 40,
@@ -135,8 +120,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       FlatButton(
-                        // textColor: Theme.of(context).primaryColor,
-                        // child: FlatButton(
                         child: RaisedButton(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -146,7 +129,6 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text('Registrieren'),
                           onPressed: _showRegisterScreen,
                         ),
-                        // ),
                       )
                     ],
                     mainAxisAlignment: MainAxisAlignment.center,
