@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:its_car_rental/Services/SecureStorageService.dart';
 import 'package:its_car_rental/Services/UserService.dart';
 import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
 
@@ -16,6 +15,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  UserService userService = new UserService();
 
   final globalKey = GlobalKey<ScaffoldState>();
 
@@ -26,10 +26,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _checkIfAlreadyLoggedIn() async {
-    final String jwtToken = await SecureStorageService().getItem('jwt');
-    if (jwtToken != null && jwtToken != '') {
+    if(await userService.checkLogin()) {
+      WidgetsFlutterBinding.ensureInitialized();
       Navigator.pushNamed(context, '/home');
-      return;
     }
   }
 

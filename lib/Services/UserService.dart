@@ -59,10 +59,19 @@ class UserService {
     return _user;
   }
 
-  bool checkLogin() {
+  Future<bool> checkLogin() async {
     if(this._user == null || this._jwt == null || this._jwt == "") {
-      //ToDo: Try to get jwt from securestorage and reauth user
-      return false;
+      try {
+        final String jwtToken = await SecureStorageService().getItem('jwt');
+        final http.Response userResponse = await HttpService.getRequest('auth/_me', jwtToken);
+        _user = new UserDTO.fromJsonFactory(jsonDecode(userResponse.body));
+        _jwt = jwtToken;
+        return true;
+      } catch(Exception) {
+        _jwt = null;
+        _user = null;
+        return false;
+      }
     }
     return true;
   }

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'Services/UserService.dart';
-import 'WidgetUtils/GeneralUtils.dart';
+import '../Services/UserService.dart';
+import 'GeneralUtils.dart';
 
 class UserPopupMenuButton extends StatelessWidget {
   final UserService userService = new UserService();
 
   String _getUsername() {
-    return userService?.user?.name != null ? userService.user.name : 'NO USERNMAE';
+    final String username = userService?.user?.surName + ' ' + userService?.user?.name;
+    return username != null && username != ' ' ? username : 'NO USERNAME';
   }
 
   String _getUserMail() {
@@ -37,7 +38,7 @@ class UserPopupMenuButton extends StatelessWidget {
         );
         items.add(
           new PopupMenuItem(
-            child: Row(
+            child: Column(
               children: <Widget>[
                 Chip(
                   avatar: Icon(Icons.email_outlined,

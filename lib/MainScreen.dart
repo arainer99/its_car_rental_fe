@@ -4,7 +4,7 @@ import 'package:its_car_rental/DTOs/VehicleCategoryDTO.dart';
 import 'package:its_car_rental/Services/UserService.dart';
 import 'package:its_car_rental/Services/VehicleService.dart';
 
-import 'UserPopupMenuButton.dart';
+import 'WidgetUtils/UserPopupMenuButton.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -37,6 +37,14 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void checkLogin() async {
+    if(await this.userService.checkLogin() == false) {
+      print('User not logged in!');
+      WidgetsFlutterBinding.ensureInitialized();
+      Navigator.pushNamed(context, '/');
+    }
+  }
+
   String _getUrl([String url]) {
     return url != null && url.length == 0
         ? url
@@ -47,6 +55,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     this.getVehicleCategories();
+    this.checkLogin();
   }
 
   @override
