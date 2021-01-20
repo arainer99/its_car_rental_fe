@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:its_car_rental/DTOs/VehicleCategoryDTO.dart';
 import 'package:its_car_rental/Services/UserService.dart';
 import 'package:its_car_rental/Services/VehicleService.dart';
+import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'WidgetUtils/UserPopupMenuButton.dart';
 
@@ -17,17 +19,20 @@ class _MainScreenState extends State<MainScreen> {
   UserService userService = new UserService();
   VehicleService vehicleService = new VehicleService();
 
+  TextEditingController _groupNameController = new TextEditingController();
+  TextEditingController _iconUrlController = new TextEditingController();
+
   List<VehicleCategoryDTO> vehicleCategories = new List();
 
   String _jwt;
 
-  String _getJwt() {
-    userService.getJwt().then((value) => setState(() {
-          _jwt = value;
-        }));
-
-    return _jwt;
-  }
+  // String _getJwt() {
+  //   userService.getJwt().then((value) => setState(() {
+  //         _jwt = value;
+  //       }));
+  //
+  //   return _jwt;
+  // }
 
   void getVehicleCategories() async {
     final List<VehicleCategoryDTO> _vehicles =
@@ -38,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void checkLogin() async {
-    if(await this.userService.checkLogin() == false) {
+    if (await this.userService.checkLogin() == false) {
       print('User not logged in!');
       WidgetsFlutterBinding.ensureInitialized();
       Navigator.pushNamed(context, '/');
@@ -93,6 +98,61 @@ class _MainScreenState extends State<MainScreen> {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          showMaterialModalBottomSheet(
+            context: context,
+            enableDrag: true,
+            builder: (BuildContext context) {
+              return Container(
+                height: 500,
+                color: Colors.grey[100],
+                child: ListView(
+                  children: <Widget>[
+                    Container(
+                      color: Colors.grey,
+                      height: 40,
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            'Add a new Vehicle Group',
+                            textAlign: TextAlign.center,
+                          ),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              icon: Icon(Icons.save),
+                              onPressed: () async {
+                                final VehicleCategoryDTO newCategory =
+                                    await vehicleService.addCategory(
+                                        _groupNameController.text,
+                                        _iconUrlController.text,
+                                        userService.jwt);
+                                setState(() {
+                                  vehicleCategories.add(newCategory);
+                                });
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    ItsOutlinedInputField(
+                      labelText: 'Group-Name',
+                      controller: _groupNameController,
+                    ),
+                    ItsOutlinedInputField(
+                      labelText: 'Icon-URL',
+                      controller: _iconUrlController,
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

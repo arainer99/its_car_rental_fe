@@ -10,4 +10,20 @@ class VehicleService {
     Iterable vehicleCategories = jsonDecode(response.body);
     return List<VehicleCategoryDTO>.from(vehicleCategories.map((model) => VehicleCategoryDTO.fromJsonFactory(model)));
   }
+  
+  Future<VehicleCategoryDTO> addCategory(String groupname, String iconUrl, String jwt) async {
+    final String body = jsonEncode(<String, String>{
+      'name': groupname,
+      'iconUrl': iconUrl
+    });
+    try {
+      final http.Response response = await HttpService.postRequest('vehicle-categories', body, jwt);
+      final VehicleCategoryDTO newCategory = VehicleCategoryDTO.fromJsonFactory(jsonDecode(response.body));
+      print('Group added');
+      return newCategory;
+    } catch (Exception) {
+      print('Add Group has failed');
+      return null;
+    }
+  }
 }
