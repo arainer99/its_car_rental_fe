@@ -36,7 +36,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void getVehicleCategories() async {
     final List<VehicleCategoryDTO> _vehicles =
-        await vehicleService.getCategories(userService.jwt);
+    await vehicleService.getCategories(userService.jwt);
     setState(() {
       this.vehicleCategories = _vehicles;
     });
@@ -56,16 +56,113 @@ class _MainScreenState extends State<MainScreen> {
         : 'https://torqueconsultants.com/wp-content/plugins/tbs-car-catalog/images/no-image.png';
   }
 
-  @override
-  void initState() {
-    super.initState();
-    this.getVehicleCategories();
-    this.checkLogin();
+  Widget _btnAddGroup() {
+    if (!userService.isAdmin()) {
+      return null;
+    }
+    return FloatingActionButton(
+      child: Icon(Icons.add),
+      onPressed: () {
+        showMaterialModalBottomSheet(
+          context: context,
+          enableDrag: true,
+          builder: (BuildContext context) {
+            return Container(
+              height: 500,
+              color: Colors.grey[100],
+              child: ListView(
+                children: <Widget>[
+                  Container(
+                    color: Colors.grey,
+                    height: 40,
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          'Add a new Vehicle Group',
+                          textAlign: TextAlign.center,
+                        ),
+                        Container(
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            icon: Icon(Icons.save),
+                            onPressed: () async {
+                              final VehicleCategoryDTO newCategory =
+                              await vehicleService.addCategory(
+                                  _groupNameController.text,
+                                  _iconUrlController.text,
+                                  userService.jwt);
+                              setState(() {
+                                vehicleCategories.add(newCategory);
+                              });
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  ItsOutlinedInputField(
+                    labelText: 'Group-Name',
+                    controller: _groupNameController,
+                  ),
+                  ItsOutlinedInputField(
+                    labelText: 'Icon-URL',
+                    controller: _iconUrlController,
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  void _editGroup() {
+    if (!userService.isAdmin()) return;
+    showMaterialModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 150,
+          child: ListView(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.delete_forever),
+                  CenteredText('Delete'),
+                ],
+              ),
+              Container(
+                  height: 20
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.edit),
+                  CenteredText('Edit'),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  ;
+}
+
+@override
+void initState() {
+  super.initState();
+  this.getVehicleCategories();
+  this.checkLogin();
+}
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
       appBar: AppBar(
         title: Text('Categories'),
         actions: [UserPopupMenuButton()],
@@ -80,6 +177,7 @@ class _MainScreenState extends State<MainScreen> {
               onTap: () {
                 print('Tapped on: ' + vehicleCategories[index].name);
               },
+              onLongPress: _editGroup,
               title: Row(
                 children: [
                   Image.network(
@@ -99,61 +197,5 @@ class _MainScreenState extends State<MainScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          showMaterialModalBottomSheet(
-            context: context,
-            enableDrag: true,
-            builder: (BuildContext context) {
-              return Container(
-                height: 500,
-                color: Colors.grey[100],
-                child: ListView(
-                  children: <Widget>[
-                    Container(
-                      color: Colors.grey,
-                      height: 40,
-                      child: Row(
-                        children: <Widget>[
-                          Text(
-                            'Add a new Vehicle Group',
-                            textAlign: TextAlign.center,
-                          ),
-                          Container(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: Icon(Icons.save),
-                              onPressed: () async {
-                                final VehicleCategoryDTO newCategory =
-                                    await vehicleService.addCategory(
-                                        _groupNameController.text,
-                                        _iconUrlController.text,
-                                        userService.jwt);
-                                setState(() {
-                                  vehicleCategories.add(newCategory);
-                                });
-                              },
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    ItsOutlinedInputField(
-                      labelText: 'Group-Name',
-                      controller: _groupNameController,
-                    ),
-                    ItsOutlinedInputField(
-                      labelText: 'Icon-URL',
-                      controller: _iconUrlController,
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
+      floatingActionButton: _btnAddGroup());
+}}
