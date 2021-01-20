@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _checkIfAlreadyLoggedIn() async {
     final String jwtToken = await SecureStorageService().getItem('jwt');
-    if (jwtToken != null && jwtToken.isNotEmpty) {
+    if (jwtToken != null && jwtToken != '') {
       Navigator.pushNamed(context, '/home');
       return;
     }

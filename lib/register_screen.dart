@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:its_car_rental/DTOs/userDTO.dart';
 import 'package:its_car_rental/Services/UserService.dart';
 import 'package:its_car_rental/WidgetUtils/GeneralUtils.dart';
 
@@ -20,9 +21,9 @@ class _RegisterScreenState extends State<StatefulWidget> {
 
   void _register() async {
     final UserService userService = new UserService();
-    if (userService.register(nameController.text, surNameController.text,
-            mailController.text, passwordController.text) !=
-        null) {
+    final UserDTO user = await userService.register(nameController.text, surNameController.text,
+        mailController.text, passwordController.text);
+    if (user != null) {
       Navigator.pushNamed(context, '/home');
       return;
     }

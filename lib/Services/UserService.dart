@@ -11,8 +11,16 @@ class UserService {
   UserService._internal();
 
   UserDTO _user;
+  String _jwt;
 
   UserDTO get user => _user;
+  String get jwt => _jwt;
+
+  bool isAdmin() => _user.role == 'admin';
+
+  Future<String> getJwt() async {
+    return SecureStorageService().getItem('jwt');
+  }
 
   Future<UserDTO> login(String email, String password) async {
     final String body = jsonEncode(<String, String>{
@@ -21,8 +29,10 @@ class UserService {
     });
     try {
       final http.Response response = await HttpService.postRequest('auth/login', body);
-      SecureStorageService().addItem('jwt', jsonDecode(response.body)['token']['accessToken']);
-      _user = new UserDTO.fromJsonFactory(jsonDecode(response.body)['user']);
+      this._jwt = jsonDecode(response.body)['accessToken'];
+      SecureStorageService().addItem('jwt', this._jwt);
+      final http.Response userResponse = await HttpService.getRequest('auth/_me', jwt);
+      _user = new UserDTO.fromJsonFactory(jsonDecode(userResponse.body));
     } catch (Exception) {
       print('LOGIN FAILED');
       return null;
@@ -39,12 +49,27 @@ class UserService {
     });
     try {
       final http.Response response = await HttpService.postRequest('auth/register', body);
-      SecureStorageService().addItem('jwt', jsonDecode(response.body)['token']['accessToken']);
+      this._jwt = jsonDecode(response.body)['token']['accessToken'];
+      SecureStorageService().addItem('jwt', this._jwt);
       _user = new UserDTO.fromJsonFactory(jsonDecode(response.body)['user']);
     } catch (Exception) {
       print('Register failed');
       return null;
     }
     return _user;
+  }
+
+  bool checkLogin() {
+    if(this._user == null || this._jwt == null || this._jwt == "") {
+      //ToDo: Try to get jwt from securestorage and reauth user
+      return false;
+    }
+    return true;
+  }
+
+  logout(BuildContext context) {
+    SecureStorageService().deleteItem('jwt');
+    this._jwt = null;
+    Navigator.pushNamed(context, '/');
   }
 }
