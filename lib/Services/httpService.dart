@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class HttpService {
-  static final String base_url = 'http://192.168.130.44:3000/api/v1/';
+  static final String base_url = 'http://192.168.130.41:3000/api/v1/';
 
   static Map<String, String> headers([String _jwt]) {
     String bearerToken = "";

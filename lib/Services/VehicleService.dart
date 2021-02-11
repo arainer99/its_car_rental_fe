@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:its_car_rental/DTOs/VehicleCategoryDTO.dart';
 import 'package:its_car_rental/Services/httpService.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +23,16 @@ class VehicleService {
     } catch (Exception) {
       print('Add Group has failed');
       return null;
+    }
+  }
+
+  Future<bool> deleteCategory(int id, String jwt) async {
+    try {
+      final http.Response response = await HttpService.deleteRequest('vehicle-categories/$id', jwt);
+      return true;
+    } catch (Exception) {
+      print ('Group could not have been deleted');
+      return false;
     }
   }
 }
